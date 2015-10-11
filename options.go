@@ -6,6 +6,7 @@ import (
 )
 
 type Options struct {
+	inFilename  string
 	name        string
 	numValues   int
 	packageName string
@@ -15,6 +16,7 @@ type Options struct {
 func SetupOptions() (options *Options) {
 	options = new(Options)
 
+	flag.StringVar(&options.inFilename, "inf", "", "Filename of file containing enumerated type string values")
 	flag.StringVar(&options.name, "name", "", "Enumerated type name")
 	flag.IntVar(&options.numValues, "numvalues", -1, "Number of enumerated type values")
 	flag.StringVar(&options.packageName, "pkg", "main", "Package name. Defaults to 'main'")
