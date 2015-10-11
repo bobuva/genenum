@@ -38,12 +38,12 @@ func main() {
 }
 
 func usage() {
-	fmt.Printf("Usage: %v [-inf=<input filename>] | [[-name=<enumerated type name>] [-numvalues=<number of values>]] -pkg=<package name - defaults to 'main'>\n", os.Args[0])
-	fmt.Printf("ex: %v -inf=Colors.txt \n", os.Args[0])
+	fmt.Printf("Usage: %v [-inf=<input filename>] | [[-name=<enumerated type name>] [-numvalues=<number of values>]] [-pkg=<package name - defaults to 'main'>] [-prefix=<boolean>]\n", os.Args[0])
+	fmt.Printf("ex: %v -inf=Colors \n", os.Args[0])
 	fmt.Printf("ex: %v -name=Colors -numvalues=4\n", os.Args[0])
 	fmt.Printf("    %v -name=Languages -numvalues=8 -pkg=words\n")
-	fmt.Printf("ex: %v -inf=Colors.txt -pkg=paint\n", os.Args[0])
-
+	fmt.Printf("ex: %v -inf=Colors -pkg=paint\n", os.Args[0])
+	fmt.Printf("ex: %v -inf=Colors -prefix=true")
 }
 
 // creates a new enumerated type in a file named <name>.go
@@ -108,6 +108,11 @@ func internalGenerateEnum(enum *EnumData, options *Options) (string, error) {
 	lines := make([]string, 0, (enum.numberValues*2)+20)
 	lines = append(lines, fmt.Sprintf("package %v\n\n", options.packageName))
 
+	// prefixing of the type name and an underscore
+	prefix := ""
+	if options.usePrefix {
+		prefix = enum.typeName + "_"
+	}
 	// enumeration value type: int8 or int16
 	var intSize string
 	if enum.numberValues < 256 {
@@ -130,9 +135,9 @@ func internalGenerateEnum(enum *EnumData, options *Options) (string, error) {
 
 	for i := 1; i <= enum.numberValues; i++ {
 		if enum.useValueNames {
-			lines = append(lines, fmt.Sprintf("%v%v", indent, enum.valueNames[i-1]))
+			lines = append(lines, fmt.Sprintf("%v%v%v", indent, prefix, enum.valueNames[i-1]))
 		} else {
-			lines = append(lines, fmt.Sprintf("%v%v%v", indent, enum.typeName, i))
+			lines = append(lines, fmt.Sprintf("%v%v%v%v", indent, prefix, enum.typeName, i))
 		}
 	}
 	lines = append(lines, ")")
@@ -148,9 +153,9 @@ func internalGenerateEnum(enum *EnumData, options *Options) (string, error) {
 	lines = append(lines, fmt.Sprintf("map[string]%v {", enum.typeName))
 	for i := 1; i <= enum.numberValues; i++ {
 		if enum.useValueNames {
-			lines = append(lines, fmt.Sprintf("%v\"%v\":\t%v,", indent, enum.valueNames[i-1], enum.valueNames[i-1]))
+			lines = append(lines, fmt.Sprintf("%v\"%v\":\t%v%v,", indent, enum.valueNames[i-1], prefix, enum.valueNames[i-1]))
 		} else {
-			lines = append(lines, fmt.Sprintf("%v\"%v%v\":\t%v%v,", indent, enum.typeName, i, enum.typeName, i))
+			lines = append(lines, fmt.Sprintf("%v\"%v%v\":\t%v%v%v,", indent, enum.typeName, i, prefix, enum.typeName, i))
 		}
 	}
 	lines = append(lines, "}")

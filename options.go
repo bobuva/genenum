@@ -10,6 +10,7 @@ type Options struct {
 	name        string
 	numValues   int
 	packageName string
+	usePrefix   bool
 }
 
 // SetupOptions parses and post-normalizes options.
@@ -20,6 +21,7 @@ func SetupOptions() (options *Options) {
 	flag.StringVar(&options.name, "name", "", "Enumerated type name")
 	flag.IntVar(&options.numValues, "numvalues", -1, "Number of enumerated type values")
 	flag.StringVar(&options.packageName, "pkg", "main", "Package name. Defaults to 'main'")
+	flag.BoolVar(&options.usePrefix, "useprefix", true, "If true, the name of the type will be used as a prefix with an underscore character")
 	flag.Parse()
 
 	if options.numValues > 200 {
